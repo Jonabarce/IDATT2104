@@ -2,7 +2,7 @@ package com.example.compiler.Service;
 
 import com.example.compiler.Modal.Code;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,12 +22,24 @@ public class CompilerService {
         process.getOutputStream().write(sourceCode.getBytes());
         process.getOutputStream().close();
 
-        InputStream inputStream = process.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        InputStream errorStream = process.getErrorStream();
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
+        StringBuilder errorOutput = new StringBuilder();
+        String errorLine;
+        while ((errorLine = errorReader.readLine()) != null) {
+            errorOutput.append(errorLine).append("\n");
+        }
+
         StringBuilder output = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            output.append(line).append("\n");
+        if (errorOutput.length() == 0) {
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+        } else {
+            output.append(errorOutput);
         }
 
         try {
@@ -38,4 +50,6 @@ public class CompilerService {
 
         return output.toString();
     }
+
 }
+
