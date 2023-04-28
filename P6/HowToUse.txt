@@ -1,0 +1,4 @@
+Start først javacript filen ved å skrive node WebClient
+Start så WebSocket programmet
+Koble to klienter i nettlesern på localhost:3000
+
